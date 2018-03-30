@@ -13,8 +13,13 @@ if ($splitData[1] -eq "Baðlandý"){
     
     # search for SSID, split on the colon, get the second element and trim it.
     $ssidSearch = $wifiInfo | Select-String -Pattern "SSID"
-    $ssid = ($ssidSearch -split ":")[1].Trim()
+    $tmpSsidSearch = ($ssidSearch -split ":")
+    $ssid = $tmpSsidSearch[1].Trim()
     "SSID: " + $ssid
+    
+    # get bssid info
+    $bssid = $tmpSsidSearch[3..$tmpSsidSearch.count] -replace "\n"
+    "BSSID: " + $bssid
     
     # get radio type
     $radioTypeSearch = $wifiInfo | Select-String -Pattern "Radyo türü"
@@ -36,12 +41,24 @@ if ($splitData[1] -eq "Baðlandý"){
     $tmpPhysicalAddr = $physicalAddrSearch -split ":"
     $physicalAddr = ($tmpPhysicalAddr)[1..$tmpPhysicalAddr.count]
     "Fiziksel Adres: " + $physicalAddr
-    
-    
 
     # show network info
+    # get IP address
     $ipAddress = (Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object {($_.IPEnabled -eq $true) -and ($_.DHCPEnabled -eq $true)} | Select IPAddress).IPAddress[0]
+    "IP adresi: " + $ipAddress
     
     $detailedInfo = Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE -ComputerName . | Select-Object -Property [a-z]* -ExcludeProperty IPX*,WINS*
-
+    #$detailedInfo
+    
+    # get default gateway info
+    $defaultGatewaySearch = $detailedInfo | findstr /C:"DefaultIPGateway"
+    # trim and remove the curly braces
+    $defaultGateway = ($defaultGatewaySearch -split ":")[1].Trim() -replace "{" -replace "}"
+    "Default gateway: " + $defaultGateway
+    
+   
+    
+    
+    
+    
 }
