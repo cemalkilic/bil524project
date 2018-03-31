@@ -59,6 +59,25 @@ function showInfoForFileOut([bool]$connected){
     }
 }
 
+# function prints info to the command line
+function showInfoForCommandLine([bool]$connected){
+    if($connected -eq 1){
+        if($language -eq "tr"){
+            "Baðlý olduðunuz " + $ssid + " aðýna ait detaylar " + $fileName + " dosyasýna yazdýrýlmýþtýr."
+        } ElseIf($language -eq "en"){
+            "Details about the network " + $ssid + " printed to the file " + $fileName + "."
+        }
+    } Else {
+        if($language -eq "tr"){
+            "Herhangi bir aða baðlý deðilsiniz."
+            "Baðlanabileceðiniz aðlarýn listesi " + $fileName + " dosyasýna yazdýrýlmýþtýr."
+        } ElseIf($language -eq "en"){
+            "You are not connected to any network."
+            "A list of available wireless networks printed to the file " + $fileName + "."
+        }
+    }
+}
+
 $data = netsh interface show interface | Select-String $strWireless
 
 $splitData = $data -split '\s+'
@@ -129,7 +148,8 @@ if ($splitData[1] -eq $strConnected){
     $defaultGateway = ($defaultGatewaySearch -split ":")[1].Trim() -replace "{" -replace "}"
     $obj | add-member noteproperty $strDefaultGateway ($defaultGateway)
     
-     showInfoForFileOut(1) | Out-File $fileName
+    showInfoForFileOut(1) | Out-File $fileName
+    showInfoForCommandLine(1)
     
     # when outputting to the file, there is no need 
     # to be formatted as a table.
@@ -183,5 +203,5 @@ if ($splitData[1] -eq $strConnected){
     # formatting output as a table makes it easier to read
     $outArray | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File $fileName -Append
     
-    
+    showInfoForCommandLine(0)
 }
