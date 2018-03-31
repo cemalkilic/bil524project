@@ -12,6 +12,8 @@ if($language -eq "tr"){
     $strChannel = "Kanal"
     $strIPAddress = "IP Adresi"
     $strDefaultGateway = "Varsayýlan Yönlendirici"
+    $strConnected = "Baðlandý"
+    $strWireless = "Kablosuz"
 } ElseIf($language -eq "en"){
     $strSSID = "SSID"
     $strBSSID = "BSSID"
@@ -23,6 +25,8 @@ if($language -eq "tr"){
     $strChannel = "Channel"
     $strIPAddress = "IP Address"
     $strDefaultGateway = "Default Gateway"
+    $strConnected = "Connected"
+    $strWireless = "Wireless"
 }
 
 
@@ -33,18 +37,17 @@ function correctMAC([string]$str){
     $str -replace " ", ":"
 }
 
-# for turkish, get the wireless network info
-$data = netsh interface show interface | findstr /C:"Kablosuz"
+$data = netsh interface show interface | Select-String $strWireless
 
 $splitData = $data -split '\s+'
 
 # splitData[1] includes info about connection state
-if ($splitData[1] -eq "Baðlandý"){
+if ($splitData[1] -eq $strConnected){
 
     # obj holds info about the current connected network
     $obj = new-object psobject
     
-    #get wifi info
+    # get wifi info
     $wifiInfo = netsh wlan show interfaces
     
     # search for SSID, split on the colon, get the second element and trim it.
@@ -87,13 +90,11 @@ if ($splitData[1] -eq "Baðlandý"){
     $physicalAddr = correctMAC($physicalAddr)
     $obj | add-member noteproperty $strPhyAddress ($physicalAddr)
     
-    # todo
     # get channel info
     $channelSearch = $wifiInfo | Select-String -Pattern $strChannel
     $channel = ($channelSearch -split ":")[1].Trim()
     $obj | add-member noteproperty $strChannel ($channel)
 
-    # show network info
     # get IP address
     $ipAddress = (Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object {($_.IPEnabled -eq $true) -and ($_.DHCPEnabled -eq $true)} | Select IPAddress).IPAddress[0]
     $obj | add-member noteproperty $strIPAddress ($ipAddress)
@@ -101,7 +102,7 @@ if ($splitData[1] -eq "Baðlandý"){
     # detailed info contains info about default gateway router
     $detailedInfo = Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE -ComputerName . | Select-Object -Property [a-z]* -ExcludeProperty IPX*,WINS*   
     # get default gateway info
-    $defaultGatewaySearch = $detailedInfo | findstr /C:"DefaultIPGateway"
+    $defaultGatewaySearch = $detailedInfo | findstr /C:"DefaultIPGateway" #this is always "DefaultIPGateway", so no need for localizing
     # trim and remove the curly braces
     $defaultGateway = ($defaultGatewaySearch -split ":")[1].Trim() -replace "{" -replace "}"
     $obj | add-member noteproperty $strDefaultGateway ($defaultGateway)
@@ -158,4 +159,3 @@ if ($splitData[1] -eq "Baðlandý"){
     
     
 }
-
