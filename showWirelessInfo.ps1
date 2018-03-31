@@ -12,6 +12,7 @@ if($language -eq "tr"){
     $strChannel = "Kanal"
     $strIPAddress = "IP Adresi"
     $strDefaultGateway = "Varsayýlan Yönlendirici"
+    $strKey = "Anahtar Ýçeriði"
     $strConnected = "Baðlandý"
     $strWireless = "Kablosuz"
     $fileTimeInfoMessage = "Bu rapor þu tarihte oluþturulmuþtur: "
@@ -28,6 +29,7 @@ if($language -eq "tr"){
     $strChannel = "Channel"
     $strIPAddress = "IP Address"
     $strDefaultGateway = "Default Gateway"
+    $strKey = "Key Content"
     $strConnected = "Connected"
     $strWireless = "Wireless"
     $fileTimeInfoMessage = "This report created on "
@@ -147,6 +149,11 @@ if ($splitData[1] -eq $strConnected){
     # trim and remove the curly braces
     $defaultGateway = ($defaultGatewaySearch -split ":")[1].Trim() -replace "{" -replace "}"
     $obj | add-member noteproperty $strDefaultGateway ($defaultGateway)
+    
+    # get the password of the connected wlan
+    $pwdSearch = netsh wlan show profiles name = $ssid key = clear | Select-String $strKey
+    $pwd = ($pwdSearch -split ":")[1].Trim()
+    $obj | add-member noteproperty $strKey ($pwd)
     
     showInfoForFileOut(1) | Out-File $fileName
     showInfoForCommandLine(1)
