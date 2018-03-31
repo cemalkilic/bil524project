@@ -1,7 +1,11 @@
-# handle language setting later
-$language = "tr"
+# Author : Cemal Kilic <cemalkilic96 [at] gmail.com>
+# Last Change : 31-Mar-2018
 
-if($language -eq "tr"){
+# Get-WinSystemLocale is not a default cmdlet.
+# So this option has to be set manually.
+$LANGUAGE = "tr"
+
+if($LANGUAGE -eq "tr"){
     $strSSID = "SSID"
     $strBSSID = "BSSID"
     $strRadioType = "Radyo Türü"
@@ -18,7 +22,7 @@ if($language -eq "tr"){
     $fileTimeInfoMessage = "Bu rapor þu tarihte oluþturulmuþtur: "
     $fileConnectedInfoMessage = "Baðlý olduðunuz aða ait detaylý bilgiler aþaðýdadýr:"
     $fileNotConnectedInfoMessage = "Herhangi bir aða baðlý deðilsiniz ancak baðlanýlabilecek aðlar aþaðýda listelenmiþtir:"
-} ElseIf($language -eq "en"){
+} ElseIf($LANGUAGE -eq "en"){
     $strSSID = "SSID"
     $strBSSID = "BSSID"
     $strRadioType = "Radio Type"
@@ -64,16 +68,16 @@ function showInfoForFileOut([bool]$connected){
 # function prints info to the command line
 function showInfoForCommandLine([bool]$connected){
     if($connected -eq 1){
-        if($language -eq "tr"){
+        if($LANGUAGE -eq "tr"){
             "Baðlý olduðunuz " + $ssid + " aðýna ait detaylar " + $fileName + " dosyasýna yazdýrýlmýþtýr."
-        } ElseIf($language -eq "en"){
+        } ElseIf($LANGUAGE -eq "en"){
             "Details about the network " + $ssid + " printed to the file " + $fileName + "."
         }
     } Else {
-        if($language -eq "tr"){
+        if($LANGUAGE -eq "tr"){
             "Herhangi bir aða baðlý deðilsiniz."
             "Baðlanabileceðiniz aðlarýn listesi " + $fileName + " dosyasýna yazdýrýlmýþtýr."
-        } ElseIf($language -eq "en"){
+        } ElseIf($LANGUAGE -eq "en"){
             "You are not connected to any network."
             "A list of available wireless networks printed to the file " + $fileName + "."
         }
