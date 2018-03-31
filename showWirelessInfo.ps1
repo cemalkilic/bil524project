@@ -1,17 +1,30 @@
 # handle language setting later
 $language = "tr"
 
-# for localization
-$strSSID = "SSID"
-$strBSSID = "BSSID"
-$strRadioType = "Radyo Türü"
-$strSignal = "Sinyal"
-$strAuthentication = "Kimlik Doðrulama"
-$strPhyAddress = "Fiziksel Adres"
-$strEncryption = "Þifre"
-$strChannel = "Kanal"
-$strIPAddress = "IP Adresi"
-$strDefaultGateway = "Varsayýlan Yönlendirici"
+if($language -eq "tr"){
+    $strSSID = "SSID"
+    $strBSSID = "BSSID"
+    $strRadioType = "Radyo Türü"
+    $strSignal = "Sinyal"
+    $strAuthentication = "Kimlik Doðrulama"
+    $strPhyAddress = "Fiziksel Adres"
+    $strEncryption = "Þifre"
+    $strChannel = "Kanal"
+    $strIPAddress = "IP Adresi"
+    $strDefaultGateway = "Varsayýlan Yönlendirici"
+} ElseIf($language -eq "en"){
+    $strSSID = "SSID"
+    $strBSSID = "BSSID"
+    $strRadioType = "Radio Type"
+    $strSignal = "Signal"
+    $strAuthentication = "Authentication"
+    $strPhyAddress = "Physical Address"
+    $strEncryption = "Cipher"
+    $strChannel = "Channel"
+    $strIPAddress = "IP Address"
+    $strDefaultGateway = "Default Gateway"
+}
+
 
 # function to replace whitespaces with colons
 # in the main code, i split original string on
