@@ -51,13 +51,13 @@ if ($splitData[1] -eq "Baðlandý"){
     $ssidSearch = $wifiInfo | Select-String -Pattern $strSSID
     $tmpSsidSearch = ($ssidSearch -split ":")
     $ssid = $tmpSsidSearch[1].Trim()
-    $obj | add-member noteproperty SSID ($ssid)
+    $obj | add-member noteproperty $strSSID ($ssid)
     
     # get bssid info
     $bssid = $tmpSsidSearch[3..$tmpSsidSearch.count] -replace "\n"   
     $bssid = $bssid -replace "^\s" # remove only the first whitespace
     $bssid = correctMAC($bssid)
-    $obj | add-member noteproperty BSSID ($bssid)
+    $obj | add-member noteproperty $strBSSID ($bssid)
     
     # get radio type
     $radioTypeSearch = $wifiInfo | Select-String -Pattern $strRadioType
@@ -141,7 +141,7 @@ if ($splitData[1] -eq "Baðlandý"){
         $channel[$i] = ($channel[$i] -split ":")[1].Trim()
         
         $obj = new-object psobject
-        $obj | add-member noteproperty SSID ($ssids[$i])
+        $obj | add-member noteproperty $strSSID ($ssids[$i])
         $obj | add-member noteproperty $strEncryption ($encryption[$i])
         $obj | add-member noteproperty $strSignal ($signal[$i])
         $obj | add-member noteproperty $strAuthentication ($authentication[$i])
