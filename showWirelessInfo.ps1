@@ -10,6 +10,15 @@ $strAuthentication = "Kimlik Doðrulama"
 $strPhyAddress = "Fiziksel Adres"
 $strEncryption = "Þifre"
 $strChannel = "Kanal"
+$strIPAddress = "IP Adresi"
+$strDefaultGateway = "Varsayýlan Yönlendirici"
+
+# function to replace whitespaces with colons
+# in the main code, i split original string on
+# colons, physical addresses need colons
+function correctMAC([string]$str){
+    $str -replace " ", ":"
+}
 
 # for turkish, get the wireless network info
 $data = netsh interface show interface | findstr /C:"Kablosuz"
@@ -18,6 +27,10 @@ $splitData = $data -split '\s+'
 
 # splitData[1] includes info about connection state
 if ($splitData[1] -eq "Baðlandý"){
+
+    # obj holds info about the current connected network
+    $obj = new-object psobject
+    
     #get wifi info
     $wifiInfo = netsh wlan show interfaces
     
@@ -25,54 +38,66 @@ if ($splitData[1] -eq "Baðlandý"){
     $ssidSearch = $wifiInfo | Select-String -Pattern $strSSID
     $tmpSsidSearch = ($ssidSearch -split ":")
     $ssid = $tmpSsidSearch[1].Trim()
-    "SSID: " + $ssid
+    $obj | add-member noteproperty SSID ($ssid)
     
     # get bssid info
-    $bssid = $tmpSsidSearch[3..$tmpSsidSearch.count] -replace "\n"
-    "BSSID: " + $bssid
+    $bssid = $tmpSsidSearch[3..$tmpSsidSearch.count] -replace "\n"   
+    $bssid = $bssid -replace "^\s" # remove only the first whitespace
+    $bssid = correctMAC($bssid)
+    $obj | add-member noteproperty BSSID ($bssid)
     
     # get radio type
     $radioTypeSearch = $wifiInfo | Select-String -Pattern $strRadioType
     $radioType = ($radioTypeSearch -split ":")[1].Trim()
-    "Radyo türü: " + $radioType
+    $obj | add-member noteproperty $strRadioType ($radioType)
     
     # get signal info
     $signalSearch = $wifiInfo | Select-String -Pattern $strSignal
     $signal = ($signalSearch -split ":")[1].Trim()
-    "Sinyal: " + $signal
+    $obj | add-member noteproperty $strSignal ($signal)
     
     # get authentication info
     $authenticationSearch = $wifiInfo | Select-String -Pattern $strAuthentication
     $authentication = ($authenticationSearch -split ":")[1].Trim()
-    "Kimlik Doðrulama: " + $authentication
+    $obj | add-member noteproperty $strAuthentication ($authentication)
     
     # get the encryption type
     $encryptionSearch = $wifiInfo | Select-String -Pattern $strEncryption
     $encryption = ($encryptionSearch -split ":")[1].Trim()
-    "Þifreleme: " + $encryption
+    $obj | add-member noteproperty $strEncryption ($encryption)
     
     # get physical address
     $physicalAddrSearch = $wifiInfo | Select-String -Pattern $strPhyAddress
     $tmpPhysicalAddr = $physicalAddrSearch -split ":"
     $physicalAddr = ($tmpPhysicalAddr)[1..$tmpPhysicalAddr.count]
-    "Fiziksel Adres: " + $physicalAddr
+    $physicalAddr = $physicalAddr -replace "^\s"  # remove only the first whitespace
+    $physicalAddr = correctMAC($physicalAddr)
+    $obj | add-member noteproperty $strPhyAddress ($physicalAddr)
     
     # todo
     # get channel info
+    $channelSearch = $wifiInfo | Select-String -Pattern $strChannel
+    $channel = ($channelSearch -split ":")[1].Trim()
+    $obj | add-member noteproperty $strChannel ($channel)
 
     # show network info
     # get IP address
     $ipAddress = (Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object {($_.IPEnabled -eq $true) -and ($_.DHCPEnabled -eq $true)} | Select IPAddress).IPAddress[0]
-    "IP adresi: " + $ipAddress
+    $obj | add-member noteproperty $strIPAddress ($ipAddress)
     
-    $detailedInfo = Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE -ComputerName . | Select-Object -Property [a-z]* -ExcludeProperty IPX*,WINS*
-    #$detailedInfo
-    
+    # detailed info contains info about default gateway router
+    $detailedInfo = Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE -ComputerName . | Select-Object -Property [a-z]* -ExcludeProperty IPX*,WINS*   
     # get default gateway info
     $defaultGatewaySearch = $detailedInfo | findstr /C:"DefaultIPGateway"
     # trim and remove the curly braces
     $defaultGateway = ($defaultGatewaySearch -split ":")[1].Trim() -replace "{" -replace "}"
-    "Default gateway: " + $defaultGateway
+    $obj | add-member noteproperty $strDefaultGateway ($defaultGateway)
+    
+    # when outputting to the file, there is no need 
+    # to be formatted as a table.
+    # so just output it to a file
+    Write-Output $obj | Out-File test.txt
+   
     
 } Else{
     # show available network SSIDs
@@ -114,7 +139,10 @@ if ($splitData[1] -eq "Baðlandý"){
         
     }
     
+    # when outputting to the file,
+    # formatting output as a table makes it easier to read
     $outArray | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File test.txt 
     
     
 }
+
