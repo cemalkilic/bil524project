@@ -14,6 +14,9 @@ if($language -eq "tr"){
     $strDefaultGateway = "Varsayýlan Yönlendirici"
     $strConnected = "Baðlandý"
     $strWireless = "Kablosuz"
+    $fileTimeInfoMessage = "Bu rapor þu tarihte oluþturulmuþtur: "
+    $fileConnectedInfoMessage = "Baðlý olduðunuz aða ait detaylý bilgiler aþaðýdadýr:"
+    $fileNotConnectedInfoMessage = "Herhangi bir aða baðlý deðilsiniz ancak baðlanýlabilecek aðlar aþaðýda listelenmiþtir:"
 } ElseIf($language -eq "en"){
     $strSSID = "SSID"
     $strBSSID = "BSSID"
@@ -27,7 +30,13 @@ if($language -eq "tr"){
     $strDefaultGateway = "Default Gateway"
     $strConnected = "Connected"
     $strWireless = "Wireless"
+    $fileTimeInfoMessage = "This report created on "
+    $fileConnectedInfoMessage = "Details about the network you are currently connected as follows: "
+    $fileNotConnectedInfoMessage = "You are not connected any network, here is a list of available wlans:"
 }
+
+$currentTime = [DateTime]::Now.ToString("yyyyMMdd-HHmmss")
+$fileName = "wifi_info_" + $currentTime + ".txt" 
 
 
 # function to replace whitespaces with colons
@@ -35,6 +44,19 @@ if($language -eq "tr"){
 # colons, physical addresses need colons
 function correctMAC([string]$str){
     $str -replace " ", ":"
+}
+
+# function prints the header info to the file
+# info includes report creation time, and whether
+# computer is connected to a network or not.
+function showInfoForFileOut([bool]$connected){
+    $time = Get-Date
+    $fileTimeInfoMessage + $time
+    if($connected -eq 1){
+        $fileConnectedInfoMessage
+    } Else {
+        $fileNotConnectedInfoMessage
+    }
 }
 
 $data = netsh interface show interface | Select-String $strWireless
@@ -107,10 +129,12 @@ if ($splitData[1] -eq $strConnected){
     $defaultGateway = ($defaultGatewaySearch -split ":")[1].Trim() -replace "{" -replace "}"
     $obj | add-member noteproperty $strDefaultGateway ($defaultGateway)
     
+     showInfoForFileOut(1) | Out-File $fileName
+    
     # when outputting to the file, there is no need 
     # to be formatted as a table.
     # so just output it to a file
-    Write-Output $obj | Out-File test.txt
+    Write-Output $obj | Out-File $fileName -Append
    
     
 } Else{
@@ -153,9 +177,11 @@ if ($splitData[1] -eq $strConnected){
         
     }
     
+    showInfoForFileOut(0) | Out-File $fileName
+    
     # when outputting to the file,
     # formatting output as a table makes it easier to read
-    $outArray | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File test.txt 
+    $outArray | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File $fileName -Append
     
     
 }
