@@ -88,13 +88,9 @@ if ($splitData[1] -eq "Baðlandý"){
     $radioType = $networks | Select-String $strRadioType
     $channel = $networks | Select-String $strChannel
     
-    
-    # print out the header info
-    
-    "SSID`t`tSignal`tAuthentication`tEncryption`tRadioType`tChannel"
-    "----`t`t------`t--------------`t----------`t---------`t--------"
-    "`n"
-    
+
+    # array holds info about every ssid
+    $outArray = @()
     
     For($i = 0; $i -lt $ssids.count; $i++){
     
@@ -106,16 +102,19 @@ if ($splitData[1] -eq "Baðlandý"){
         $radioType[$i] = ($radioType[$i] -split ":")[1].Trim()
         $channel[$i] = ($channel[$i] -split ":")[1].Trim()
         
-        # print network info
-        $ssids[$i] + "`t" +
-        $encryption[$i] + "`t" +
-        $signal[$i] + "`t" +
-        $authentication[$i] + "`t" +
-        $radioType[$i] + "`t" +
-        $channel[$i]
+        $obj = new-object psobject
+        $obj | add-member noteproperty SSID ($ssids[$i])
+        $obj | add-member noteproperty Encryption ($encryption[$i])
+        $obj | add-member noteproperty Signal ($signal[$i])
+        $obj | add-member noteproperty Authentication ($authentication[$i])
+        $obj | add-member noteproperty RadioType ($radioType[$i])
+        $obj | add-member noteproperty Channel ($channel[$i])
+        #write-output $obj | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File -Append test.txt 
+        $outArray += $obj
         
     }
     
+    $outArray | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File test.txt 
     
     
 }
