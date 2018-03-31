@@ -8,6 +8,7 @@ $strRadioType = "Radyo Türü"
 $strSignal = "Sinyal"
 $strAuthentication = "Kimlik Doðrulama"
 $strPhyAddress = "Fiziksel Adres"
+$strEncryption = "Þifre"
 
 # for turkish, get the wireless network info
 $data = netsh interface show interface | findstr /C:"Kablosuz"
@@ -44,6 +45,11 @@ if ($splitData[1] -eq "Baðlandý"){
     $authentication = ($authenticationSearch -split ":")[1].Trim()
     "Kimlik Doðrulama: " + $authentication
     
+    # get the encryption type
+    $encryptionSearch = $wifiInfo | Select-String -Pattern $strEncryption
+    $encryption = ($encryptionSearch -split ":")[1].Trim()
+    "Þifreleme: " + $encryption
+    
     # get physical address
     $physicalAddrSearch = $wifiInfo | Select-String -Pattern $strPhyAddress
     $tmpPhysicalAddr = $physicalAddrSearch -split ":"
@@ -64,4 +70,4 @@ if ($splitData[1] -eq "Baðlandý"){
     $defaultGateway = ($defaultGatewaySearch -split ":")[1].Trim() -replace "{" -replace "}"
     "Default gateway: " + $defaultGateway
     
-}
+} 
