@@ -129,11 +129,11 @@ if ($splitData[1] -eq "Baðlandý"){
         
         $obj = new-object psobject
         $obj | add-member noteproperty SSID ($ssids[$i])
-        $obj | add-member noteproperty Encryption ($encryption[$i])
-        $obj | add-member noteproperty Signal ($signal[$i])
-        $obj | add-member noteproperty Authentication ($authentication[$i])
-        $obj | add-member noteproperty RadioType ($radioType[$i])
-        $obj | add-member noteproperty Channel ($channel[$i])
+        $obj | add-member noteproperty $strEncryption ($encryption[$i])
+        $obj | add-member noteproperty $strSignal ($signal[$i])
+        $obj | add-member noteproperty $strAuthentication ($authentication[$i])
+        $obj | add-member noteproperty $strRadioType ($radioType[$i])
+        $obj | add-member noteproperty $strChannel ($channel[$i])
         #write-output $obj | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File -Append test.txt 
         $outArray += $obj
         
