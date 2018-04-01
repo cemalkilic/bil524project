@@ -3,7 +3,36 @@
 
 # Get-WinSystemLocale is not a default cmdlet.
 # So this option has to be set manually.
-$LANGUAGE = "tr"
+param (
+   # [Parameter(Mandatory=$True)]
+    [string]$lang,
+    
+    [switch]$help
+)
+
+if($help){
+    "`n NAME`n`t Show Wireless Network Information"
+    "`n DESCRIPTION`n`t A simple script that shows about the wireless network."
+    "`n USAGE`n`t ./showWirelessInfo.ps1 -lang tr."
+    Exit
+}
+
+$LANGUAGE = "tr" # default value
+
+if(!$lang){
+    throw "-lang option has to be set your OS language. Usage example: ./showWirelessInfo.ps1 -lang tr"
+}
+
+if($lang){
+    if($lang -eq "tr"){
+        $LANGUAGE = $lang
+    } ElseIf($lang -eq "en"){
+        $LANGUAGE = $lang
+    } Else{
+        throw("-lang option must be set as either tr or en")
+        Exit
+    }
+}
 
 if($LANGUAGE -eq "tr"){
     $strSSID = "SSID"
