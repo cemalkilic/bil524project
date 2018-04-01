@@ -3,7 +3,7 @@
 A Powershell script to show wireless networks info
 
 ## Info to show:
-* If connected to a network, show info about network such as 
+* If connected to a network, show information about network such as 
 	 - SSID
 	 - Signal
 	 - Authentication type
@@ -37,6 +37,6 @@ To show the help, use the command below.
 
 ## Screenshot
 
-A sample screenshot of the script.
+A sample screenshot of the script. The output files can be found under the sample_outputs folder in this repository.
 
 ![alt text](https://github.com/cemalkilic/bil524project/blob/master/screenshots/sample_usage.jpg)
