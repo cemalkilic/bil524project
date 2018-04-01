@@ -1,6 +1,6 @@
 # BIL524 - Project
 
-A Powershell script to show wireless networks info
+A Powershell script to show wireless networks information using netsh.exe.
 
 ## Info to show:
 * If connected to a network, show information about network such as 
