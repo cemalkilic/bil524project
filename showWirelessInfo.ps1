@@ -18,6 +18,7 @@ if($LANGUAGE -eq "tr"){
     $strDefaultGateway = "Varsayýlan Yönlendirici"
     $strKey = "Anahtar Ýçeriði"
     $strConnected = "Baðlandý"
+    $strDisconnected = "Baðlantý" # actually it is "Baðlantý Kesildi"
     $strWireless = "Kablosuz"
     $fileTimeInfoMessage = "Bu rapor þu tarihte oluþturulmuþtur: "
     $fileConnectedInfoMessage = "Baðlý olduðunuz aða ait detaylý bilgiler aþaðýdadýr:"
@@ -35,6 +36,7 @@ if($LANGUAGE -eq "tr"){
     $strDefaultGateway = "Default Gateway"
     $strKey = "Key Content"
     $strConnected = "Connected"
+    $strDisconnected = "Disconnected"
     $strWireless = "Wireless"
     $fileTimeInfoMessage = "This report created on "
     $fileConnectedInfoMessage = "Details about the network you are currently connected as follows: "
@@ -81,6 +83,15 @@ function showInfoForCommandLine([bool]$connected){
             "You are not connected to any network."
             "A list of available wireless networks printed to the file " + $fileName + "."
         }
+    }
+}
+
+# function prints the message for disabled wifi
+function showDisabledWifiMes(){
+    if($LANGUAGE -eq "tr"){
+        "Aktif kablosuz að kartý bulunamadý ya da devre dýþý býrakýlmýþ."
+    } ElseIf($LANGUAGE -eq "en"){
+        "No active wireless network card has been found or it has been disabled."
     }
 }
 
@@ -168,7 +179,7 @@ if ($splitData[1] -eq $strConnected){
     Write-Output $obj | Out-File $fileName -Append
    
     
-} Else{
+} ElseIf($splitData[1] -eq $strDisconnected){
     # show available network SSIDs
     
     # get all the networks info
@@ -215,4 +226,8 @@ if ($splitData[1] -eq $strConnected){
     $outArray | Format-Table -Property * -AutoSize | Out-String -Width 4096 | Out-File $fileName -Append
     
     showInfoForCommandLine(0)
+} Else {
+    # this case happens either wireless network card is missing
+    # or it is disabled
+    showDisabledWifiMes
 }
