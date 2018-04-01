@@ -67,6 +67,14 @@ function showInfoForFileOut([bool]$connected){
     }
 }
 
+function showSSIDCount([string]$count){
+    if($LANGUAGE -eq "tr"){
+        $count + " að listeleniyor..."
+    } ElseIf($LANGUAGE -eq "en"){
+        $count + " networks are listed..."
+    }
+}
+
 # function prints info to the command line
 function showInfoForCommandLine([bool]$connected){
     if($connected -eq 1){
@@ -220,6 +228,9 @@ if ($splitData[1] -eq $strConnected){
     }
     
     showInfoForFileOut(0) | Out-File $fileName
+    
+    # print to the file how many wifi networks has been found
+    showSSIDCount($outArray.count) | Out-File $fileName -Append
     
     # when outputting to the file,
     # formatting output as a table makes it easier to read
