@@ -22,8 +22,21 @@ A Powershell script to show wireless networks info
 	- Channel
 	
 
-## How to Run
-Clone the repository and on the Powershell console simply run the command below
+## USAGE
+Clone the repository and on the Powershell console simply run the command below. The lang option has to be set accordingly to your OS's language.
+Turkish and English are the only supported languages.
 ```
-./showWirelessInfo.ps1
+./showWirelessInfo.ps1 -lang tr
 ```
+
+## Help
+To show the help, use the command below.
+```
+./showWirelessInfo.ps1 -help
+```
+
+## Screenshot
+
+A sample screenshot of the script.
+
+![alt text](https://github.com/cemalkilic/bil524project/blob/master/screenshots/sample_usage.jpg)
